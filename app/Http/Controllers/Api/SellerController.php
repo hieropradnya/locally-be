@@ -121,7 +121,7 @@ class SellerController extends Controller
 
         // validasi input
         $validator = Validator::make($request->all(), [
-            'brand_name' => 'required|max:255',
+            'brand_name' => 'nullable|max:255',
             'description' => 'nullable',
             'logo'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'banner'     => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -162,12 +162,16 @@ class SellerController extends Controller
             $file->storeAs('seller/banners', $randomBannerName, 'public');
         }
 
+        // jika description diubah
+
+
         // update data seller
         $seller->update([
-            'brand_name' => $request->brand_name,
+            'brand_name' => $request->brand_name ?? $seller->brand_name,
             'logo'       => $randomLogoName,
             'banner'     => $randomBannerName,
-            'status'     => $seller->status,
+            'status'     => $request->status ?? $seller->status,
+            'description' => $request->description ?? $seller->description
         ]);
 
         return response()->json(['success' => true, 'seller' => $seller], 200);
