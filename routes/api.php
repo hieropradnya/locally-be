@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\api\SellerController;
+use App\Http\Controllers\ProductVariantController;
 
 // user
 Route::post('/register', App\Http\Controllers\Api\RegisterController::class)->name('register');
@@ -22,7 +23,6 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/product/{id}', [ProductController::class, 'update']);
     // Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 
-
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
@@ -30,3 +30,5 @@ Route::get('/seller/{id}', [SellerController::class, 'show']);
 
 Route::get('/product', [ProductController::class, 'index']);
 Route::get('/product/{id}', [ProductController::class, 'show']);
+
+Route::get('/products/{productId}/variants', [ProductVariantController::class, 'index']);
