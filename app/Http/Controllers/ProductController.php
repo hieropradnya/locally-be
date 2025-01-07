@@ -14,7 +14,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('images', 'seller')->get();
-        return response()->json($products);
+        return response()->json(['data' => $products]);
     }
 
     public function store(Request $request)
@@ -74,7 +74,7 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load(['images', 'variants', 'category', 'seller']), 201);
+        return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);
     }
 
     public function show($id)
@@ -84,7 +84,7 @@ class ProductController extends Controller
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        return response()->json($product);
+        return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);
     }
 
     public function update(Request $request, $id)
@@ -150,7 +150,7 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load(['images', 'variants', 'category', 'seller']));
+        return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);
     }
 
     public function destroy($id)

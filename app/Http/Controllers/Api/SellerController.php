@@ -71,14 +71,14 @@ class SellerController extends Controller
         $user->role = 'seller';
         $user->save();
 
-        return response()->json(['success' => true, 'seller' => $seller], 201);
+        return response()->json(['success' => true, 'data' => $seller], 201);
     }
 
     public function index()
     {
         // $sellers = Seller::with('user')->get();
         $sellers = Seller::get();
-        return response()->json(['sellers' => $sellers], 200);
+        return response()->json(['data' => $sellers], 200);
     }
 
     public function show($id)
@@ -95,7 +95,7 @@ class SellerController extends Controller
         // kembalikan detail seller
         return response()->json([
             'success' => true,
-            'seller' => [
+            'data' => [
                 'id' => $seller->id,
                 'brand_name' => $seller->brand_name,
                 'logo' => $seller->logo ? asset('storage/seller/logos/' . $seller->logo) : null,
@@ -174,7 +174,7 @@ class SellerController extends Controller
             'description' => $request->description ?? $seller->description
         ]);
 
-        return response()->json(['success' => true, 'seller' => $seller], 200);
+        return response()->json(['success' => true, 'data' => $seller], 200);
     }
 
 
