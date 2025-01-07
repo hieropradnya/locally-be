@@ -61,17 +61,28 @@ class ProductController extends Controller
             ]);
         }
 
+        $thumbnailImage = null;
         if ($request->hasFile('images')) {
-            foreach ($request->images as $image) {
-                $extention = $image->getClientOriginalExtension();
-                $filename = Str::random(40) . '.' . $extention;
+            foreach ($request->images as $index => $image) {
+                $extension = $image->getClientOriginalExtension();
+                $filename = Str::random(40) . '.' . $extension;
+
                 $image->storeAs('productImages', $filename, 'public');
 
                 ProductImage::create([
                     'image'      => $filename,
                     'product_id' => $product->id,
                 ]);
+
+                if ($index === 0) {
+                    $thumbnailImage = $filename;
+                }
             }
+        }
+
+        if ($thumbnailImage) {
+            $product->thumbnail = $thumbnailImage;
+            $product->save();
         }
 
         return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);

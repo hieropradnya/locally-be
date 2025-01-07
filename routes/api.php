@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\api\SellerController;
@@ -25,6 +26,12 @@ Route::middleware('auth:api')->group(function () {
     // Route::delete('/product/{id}', [ProductController::class, 'destroy']);
 
     Route::post('/review', [ReviewController::class, 'store']);
+
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart', [CartController::class, 'store']);
+    // Route::get('/cart/{id}', [CartController::class, 'show'])
+    // Route::put('/cart/{id}', [CartController::class, 'update']));
+    // Route::delete('/cart/{id}', [CartController::class, 'destroy'])');
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
