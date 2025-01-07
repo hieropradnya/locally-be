@@ -6,6 +6,7 @@ use App\Models\Product;
 use Illuminate\Support\Str;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -25,7 +26,11 @@ class ProductController extends Controller
             'stock'       => 'required|integer|min:0',
             'images'      => 'required|array',
             'images.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
+            'variants'    => 'nullable|array',
+            'variants.*.variant' => 'required_with:variants|string|max:50',
+            'variants.*.stock'   => 'required_with:variants|integer|min:0',
         ]);
+
 
         $product = Product::create([
             'name'        => $request->name,
@@ -35,6 +40,23 @@ class ProductController extends Controller
             'seller_id'   => $request->user()->id,
         ]);
 
+        // jika produk memiliki variasi
+        if ($request->has('variants')) {
+            foreach ($request->variants as $variant) {
+                ProductVariant::create([
+                    'variant'    => $variant['variant'],
+                    'stock'      => $variant['stock'],
+                    'product_id' => $product->id,
+                ]);
+            }
+        } else {
+            // jika produk tidak memiliki variasi (varian default)
+            ProductVariant::create([
+                'variant'    => 'default',
+                'stock'      => $product->stock,
+                'product_id' => $product->id,
+            ]);
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->images as $image) {
@@ -49,8 +71,7 @@ class ProductController extends Controller
             }
         }
 
-
-        return response()->json($product->load('images'), 201);
+        return response()->json($product->load(['images', 'variants']), 201);
     }
 
     public function show($id)
