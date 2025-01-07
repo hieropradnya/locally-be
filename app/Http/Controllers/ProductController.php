@@ -29,6 +29,7 @@ class ProductController extends Controller
             'variants'    => 'nullable|array',
             'variants.*.variant' => 'required_with:variants|string|max:50',
             'variants.*.stock'   => 'required_with:variants|integer|min:0',
+            'category'    => 'required|integer|min:0',
         ]);
 
 
@@ -38,7 +39,9 @@ class ProductController extends Controller
             'price'       => $request->price,
             'stock'       => $request->stock,
             'seller_id'   => $request->user()->id,
+            'category_id'   => $request->category,
         ]);
+
 
         // jika produk memiliki variasi
         if ($request->has('variants')) {
@@ -71,12 +74,12 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load(['images', 'variants']), 201);
+        return response()->json($product->load(['images', 'variants', 'category', 'seller']), 201);
     }
 
     public function show($id)
     {
-        $product = Product::with('images', 'seller')->find($id);
+        $product = Product::with('images', 'variants', 'category', 'seller')->find($id);
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
@@ -86,7 +89,7 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
-        $product = Product::find($id);
+        $product = Product::with('variants', 'images')->find($id);
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
@@ -97,10 +100,31 @@ class ProductController extends Controller
             'price'       => 'sometimes|integer|min:0',
             'stock'       => 'sometimes|integer|min:0',
             'images.*'    => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            "deletedImagesId.*" => "nullable|exists:product_images,id", // validasi ID gambar yang ada di database
+            "deletedImagesId.*" => "nullable|exists:product_images,id",
+            'variants'    => 'nullable|array',
+            'variants.*.variant' => 'required_with:variants|string|max:50',
+            'variants.*.stock'   => 'required_with:variants|integer|min:0',
+            'category'    => 'sometimes|integer|min:0',
         ]);
 
-        $product->update($request->only('name', 'description', 'price', 'stock'));
+        $product->update($request->only('name', 'description', 'price', 'stock', 'category'));
+
+        if ($request->has('variants')) {
+            $product->variants()->delete();
+
+            foreach ($request->variants as $variant) {
+                ProductVariant::create([
+                    'variant'    => $variant['variant'],
+                    'stock'      => $variant['stock'],
+                    'product_id' => $product->id,
+                ]);
+            }
+        } else {
+            $defaultVariant = $product->variants()->where('variant', 'default')->first();
+            if ($defaultVariant) {
+                $defaultVariant->update(['stock' => $product->stock]);
+            }
+        }
 
         if ($request->has('deletedImagesId')) {
             foreach ($request->deletedImagesId as $imageId) {
@@ -108,7 +132,6 @@ class ProductController extends Controller
 
                 if ($productImage && $productImage->product_id == $product->id) {
                     Storage::disk('public')->delete('productImages/' . $productImage->image);
-
                     $productImage->delete();
                 }
             }
@@ -127,22 +150,22 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json($product->load('images'));
+        return response()->json($product->load(['images', 'variants', 'category', 'seller']));
     }
-
 
     public function destroy($id)
     {
-        $product = Product::find($id);
+        $product = Product::with('variants', 'images')->find($id);
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        // hapus gambar
         foreach ($product->images as $image) {
-            Storage::disk('public')->delete($image->image);
+            Storage::disk('public')->delete('productImages/' . $image->image);
             $image->delete();
         }
+
+        $product->variants()->delete();
 
         $product->delete();
 

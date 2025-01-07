@@ -13,6 +13,7 @@ class Product extends Model
         'price',
         'stock',
         'seller_id',
+        'category_id'
     ];
 
     // relasi ke Seller
