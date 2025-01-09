@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('phone', 15);
             $table->text('address');
             $table->string('postal_code', 5);
-            $table->integer('city_id');
-            $table->integer('province_id');
+            $table->unsignedInteger('city_id');
+            $table->unsignedInteger('province_id');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

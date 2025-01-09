@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('status_orders', function (Blueprint $table) {
-            $table->unsignedTinyInteger('id');
-            $table->primary('id');
-            $table->string('name', 10);
+        Schema::table('orders', function (Blueprint $table) {
+            $table->foreign('status_order_id')->references('id')->on('status_orders')->onDelete('cascade');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('status_orders');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropForeign(['status_order_id']);
+        });
     }
 };
