@@ -7,6 +7,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\api\SellerController;
 use App\Http\Controllers\ProductVariantController;
 
@@ -40,6 +41,11 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::apiResource('address', AddressController::class);
+
+
+    Route::get('/voucher', [VoucherController::class, 'index']);
+    Route::post('/voucher', [VoucherController::class, 'store']);
+    Route::post('/voucher/{id}', [VoucherController::class, 'show']);
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
