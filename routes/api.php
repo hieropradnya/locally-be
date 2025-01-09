@@ -9,6 +9,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\api\SellerController;
+use App\Http\Controllers\OngkirController;
 use App\Http\Controllers\ProductVariantController;
 
 // user
@@ -46,6 +47,11 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/voucher', [VoucherController::class, 'index']);
     Route::post('/voucher', [VoucherController::class, 'store']);
     Route::post('/voucher/{id}', [VoucherController::class, 'show']);
+
+
+    Route::get('/ongkir/getprovince', [OngkirController::class, 'getprovince']);
+    Route::get('/ongkir/getcity', [OngkirController::class, 'getcity']);
+    Route::get('/ongkir/checkshipping', [OngkirController::class, 'checkshipping']);
 });
 
 Route::get('/seller', [SellerController::class, 'index']);

@@ -26,7 +26,7 @@ class RajaOngkirSeeder extends Seeder
 
         foreach ($daftarProvinsi as $provinceRow) {
             Province::create([
-                'province_id' => $provinceRow['province_id'],
+                'id' => $provinceRow['province_id'],
                 'name'        => $provinceRow['province'],
             ]);
 
@@ -35,9 +35,9 @@ class RajaOngkirSeeder extends Seeder
                 $cityNameWithType = "{$cityRow['type']} {$cityRow['city_name']}";
 
                 City::create([
-                    'province_id' => $provinceRow['province_id'],
-                    'city_id'     => $cityRow['city_id'],
+                    'id'     => $cityRow['city_id'],
                     'name'        => $cityNameWithType,
+                    'province_id' => $provinceRow['province_id'],
                 ]);
             }
         }

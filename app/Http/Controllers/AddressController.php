@@ -19,7 +19,6 @@ class AddressController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'recipient_name' => 'required|string|max:50',
             'phone' => 'required|string|max:15',
@@ -29,18 +28,17 @@ class AddressController extends Controller
             'province_id' => 'required|integer',
         ]);
 
-        // Mendapatkan pengguna yang sedang login
         $user = auth('api')->user();
         $validated['user_id'] = $user->id;
 
-        if ($user->role === 'seller') {
-            $existingAddress = Address::where('user_id', $user->id)->first();
-            if ($existingAddress) {
-                return response()->json([
-                    'message' => 'You have created an adress record.'
-                ], 400);
-            }
+        // kirim pesan gagal jika sudah punya alamat
+        $existingAddress = Address::where('user_id', $user->id)->first();
+        if ($existingAddress) {
+            return response()->json([
+                'message' => 'You have created an adress record.'
+            ], 400);
         }
+
 
         $address = Address::create($validated);
         $address->load('city', 'province');
@@ -99,10 +97,5 @@ class AddressController extends Controller
         $address->delete();
 
         return response()->json(['message' => 'Address deleted successfully'], 200);
-    }
-
-    public function getprovince()
-    {
-        $client = new Client();
     }
 }
