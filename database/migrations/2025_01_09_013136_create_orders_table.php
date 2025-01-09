@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedTinyInteger('status_order_id');
             $table->string('message', 100)->nullable();
-            $table->unsignedInteger('total_price');
+            $table->unsignedInteger('total_price')->nullable();
             $table->tinyInteger('is_reviewed')->default(0);
             $table->unsignedBigInteger('seller_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('address_id');
-            $table->unsignedBigInteger('price_detail_id');
+            $table->unsignedBigInteger('price_detail_id')->nullable();
             $table->unsignedBigInteger('voucher_id')->nullable();
             $table->timestamps();
 

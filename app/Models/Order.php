@@ -14,7 +14,7 @@ class Order extends Model
         'seller_id',
         'user_id',
         'address_id',
-        'pricing_detail_id',
+        'price_detail_id',
         'voucher_id',
     ];
 
@@ -42,8 +42,12 @@ class Order extends Model
     {
         return $this->belongsTo(Voucher::class);
     }
-    public function status_order()
+    public function statusOrder()
     {
         return $this->belongsTo(StatusOrder::class);
+    }
+    public function orderDetail()
+    {
+        return $this->hasMany(OrderDetail::class);
     }
 }

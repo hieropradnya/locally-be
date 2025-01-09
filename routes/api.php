@@ -9,6 +9,7 @@ use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VoucherController;
 use App\Http\Controllers\api\SellerController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OngkirController;
 use App\Http\Controllers\ProductVariantController;
 
@@ -53,6 +54,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/ongkir/getcity', [OngkirController::class, 'getcity']);
     Route::get('/ongkir/checkshipping/{seller_id}', [OngkirController::class, 'checkshipping']);
     Route::post('/ongkir/processshipping', [OngkirController::class, 'processshipping']);
+
+
+    Route::post('/checkout', [CheckoutController::class, 'show']);
+    Route::post('/checkout/{id}', [CheckoutController::class, 'show']);
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
