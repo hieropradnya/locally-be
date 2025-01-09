@@ -42,4 +42,8 @@ class Order extends Model
     {
         return $this->belongsTo(Voucher::class);
     }
+    public function status_order()
+    {
+        return $this->belongsTo(StatusOrder::class);
+    }
 }

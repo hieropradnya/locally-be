@@ -51,7 +51,8 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/ongkir/getprovince', [OngkirController::class, 'getprovince']);
     Route::get('/ongkir/getcity', [OngkirController::class, 'getcity']);
-    Route::get('/ongkir/checkshipping', [OngkirController::class, 'checkshipping']);
+    Route::get('/ongkir/checkshipping/{seller_id}', [OngkirController::class, 'checkshipping']);
+    Route::post('/ongkir/processshipping', [OngkirController::class, 'processshipping']);
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
