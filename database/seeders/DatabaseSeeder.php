@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
     // }
     public function run()
     {
-        $this->call(RajaOngkirSeeder::class);
+        // $this->call(RajaOngkirSeeder::class);
+        $this->call(StatusOrderSeeder::class);
     }
 }
