@@ -31,7 +31,7 @@ class ProductController extends Controller
             'variants'    => 'nullable|array',
             'variants.*.variant' => 'required_with:variants|string|max:50',
             'variants.*.stock'   => 'required_with:variants|integer|min:0',
-            'category'    => 'required|integer|min:0',
+            'category_id'    => 'required|integer|min:0',
         ]);
 
 
@@ -41,7 +41,7 @@ class ProductController extends Controller
             'price'       => $request->price,
             'stock'       => $request->stock,
             'seller_id'   => $request->user()->id,
-            'category_id'   => $request->category,
+            'category_id'   => $request->category_id,
         ]);
 
 
@@ -87,7 +87,7 @@ class ProductController extends Controller
             $product->save();
         }
 
-        return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);
+        return new ProductDetailResource($product->load(['images', 'variants', 'category', 'seller']));
     }
 
     public function show($id)
@@ -163,7 +163,7 @@ class ProductController extends Controller
             }
         }
 
-        return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);
+        return new ProductDetailResource($product->load(['images', 'variants', 'category', 'seller']));
     }
 
     public function destroy($id)
