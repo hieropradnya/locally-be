@@ -36,10 +36,13 @@ class LoginController extends Controller
             ], 401);
         }
 
+        $user = auth()->guard('api')->user();
+        $user->profile_picture_url = url('/storage/profilePictures/' . $user->profile_picture);
+
         //jika berhasil
         return response()->json([
             'success' => true,
-            'data'    => auth()->guard('api')->user(),
+            'data'    => $user,
             'token'   => $token
         ], 200);
     }

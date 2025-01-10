@@ -7,14 +7,16 @@ use Illuminate\Support\Str;
 use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use App\Models\ProductVariant;
+use App\Http\Resources\ProductResource;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Resources\ProductDetailResource;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('images', 'seller')->get();
-        return response()->json(['data' => $products]);
+        $products = Product::with('seller')->get();
+        return ProductResource::collection($products);
     }
 
     public function store(Request $request)
@@ -90,12 +92,12 @@ class ProductController extends Controller
 
     public function show($id)
     {
-        $product = Product::with('images', 'variants', 'category', 'seller')->find($id);
+        $product = Product::with('images', 'variants', 'category', 'seller')->findOrFail($id);
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
         }
 
-        return response()->json(['data' => $product->load(['images', 'variants', 'category', 'seller'])]);
+        return new ProductDetailResource($product);
     }
 
     public function update(Request $request, $id)

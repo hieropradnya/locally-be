@@ -21,14 +21,12 @@ class RegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'username' => 'required|unique:users|max:255',
             'email'    => 'required|email|unique:users|max:255',
-            'password'  => 'required|min:8|confirmed',
+            'password'  => 'required|min:8',
             'phone'    => 'required|unique:users|max:15',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'gender'    => 'required|in:male,female',
-            'role'     => 'required|in:buyer,seller',
         ], [
             'gender.in' => 'The gender must be either male or female.',
-            'role.in' => 'The role must be either buyer or seller.',
         ]);
 
         //jika validasi tidak berhasil
@@ -37,7 +35,7 @@ class RegisterController extends Controller
         }
 
         // upload file foto jika ada
-        $randomFileName = null;
+        $randomFileName = 'default.png';
         if ($request->hasFile('profile_picture')) {
             $file = $request->file('profile_picture');
 
@@ -55,11 +53,13 @@ class RegisterController extends Controller
             'phone'    => $request->phone,
             'profile_picture' => $randomFileName,
             'gender'   => $request->gender,
-            'role'     => $request->role,
+            'role'     => 'buyer',
         ]);
 
         //jika berhasil tersimpan, return response
         if ($user) {
+            $user->profile_picture_url = url('/storage/profilePictures/' . $user->profile_picture);
+
             return response()->json([
                 'success' => true,
                 'data'    => $user,

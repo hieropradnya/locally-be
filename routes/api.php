@@ -12,6 +12,7 @@ use App\Http\Controllers\api\SellerController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\OngkirController;
 use App\Http\Controllers\ProductVariantController;
+use App\Models\User;
 
 // user
 Route::post('/register', App\Http\Controllers\Api\RegisterController::class)->name('register');
@@ -56,8 +57,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/ongkir/processshipping', [OngkirController::class, 'processshipping']);
 
 
-    Route::post('/checkout', [CheckoutController::class, 'show']);
-    Route::post('/checkout/{id}', [CheckoutController::class, 'show']);
+    Route::post('/checkout', [CheckoutController::class, 'checkout']);
+    Route::get('/checkout/{id}', [CheckoutController::class, 'show']);
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
@@ -74,24 +75,10 @@ Route::get('/products/{productId}/variants', [ProductVariantController::class, '
 
 
 
-
-Route::get('/province', function () {
-    $apiKey = env('RAJAONGKIR_API_KEY');
-
-    // Mengirimkan request ke API RajaOngkir untuk mendapatkan daftar provinsi
-    $response = Http::withHeaders([
-        'key' => $apiKey,
-    ])->get('https://api.rajaongkir.com/starter/city');
-
-    // Mengecek apakah response berhasil
-    if ($response->successful()) {
-        // Mengembalikan response dalam format JSON
-        return response()->json($response->json());
-    }
-
-    // Jika gagal, mengembalikan response error
+// untuk tes
+Route::get('/users', function () {
+    $users = User::get();
     return response()->json([
-        'status' => 'error',
-        'message' => 'Failed to fetch provinces data.'
-    ], 400);
+        'data' => $users
+    ]);
 });
