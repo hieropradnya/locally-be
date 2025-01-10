@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use Illuminate\Http\Request;
+use App\Http\Resources\CartResource;
 
 class CartController extends Controller
 {
@@ -15,7 +16,8 @@ class CartController extends Controller
             ->where('user_id', auth('api')->id())
             ->get();
 
-        return response()->json(['data' => $carts]);
+        // Mengembalikan data carts menggunakan CartResource
+        return CartResource::collection($carts);
     }
 
 

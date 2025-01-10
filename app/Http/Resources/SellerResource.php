@@ -20,7 +20,6 @@ class SellerResource extends JsonResource
             'description'   => $this->description,
             'logo'          => url('storage/seller/logos/' . $this->logo),
             'banner'        => url('storage/seller/banners/' . $this->banner),
-            'status'        => $this->status,
         ];
     }
 }
