@@ -9,6 +9,7 @@ use App\Models\OrderDetail;
 use App\Models\PriceDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\OrderResource;
 use App\Http\Resources\OrderDetailResource;
 
 class CheckoutController extends Controller
@@ -56,8 +57,6 @@ class CheckoutController extends Controller
             }
         }
 
-
-
         // Proses pengecekan stok
         foreach ($cartItems as $cartItem) {
             if ($cartItem->productVariant->stock < $cartItem->quantity) {
@@ -67,7 +66,6 @@ class CheckoutController extends Controller
             }
         }
 
-
         // Pengecekan alamat (1 user hanya punya 1 address)
         $address = $request->user()->address;
         if (!$address) {
@@ -75,7 +73,6 @@ class CheckoutController extends Controller
                 'error' => 'User does not have a valid address.'
             ], 422);
         }
-
 
         // Transaction Wrapping
         DB::beginTransaction();
@@ -126,12 +123,9 @@ class CheckoutController extends Controller
                 'total_price' => $productSubtotal,
             ]);
 
-
-
             // Step 3: Hitung PriceDetail
             $shippingCost = (int) $request->shipping_cost;
             $serviceFee = 2000;
-
 
             // Step 4: Pengecekan validitas voucher
             $discount = 0;
@@ -144,7 +138,6 @@ class CheckoutController extends Controller
                 }
             }
 
-
             // Step 5: Simpan PriceDetail
             $priceDetail = PriceDetail::create([
                 'product_subtotal' => $productSubtotal,
@@ -152,7 +145,6 @@ class CheckoutController extends Controller
                 'service_fee' => $serviceFee,
                 'discount' => $discount
             ]);
-
 
             // Step 6: Update Order dengan total_price dan price_detail_id
             $totalPrice = ($productSubtotal + $shippingCost + $serviceFee) - $discount;
@@ -166,14 +158,15 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'message' => 'Order successfully created.',
-                'data' => [
-                    'order' => $order,
-                    'orderDetail' => $orderDetails,
-                    'priceDetail' => $priceDetail
-                ],
-            ], 201);
+            $orderNew = Order::with([
+                'statusOrder',
+                'address',
+                'seller',
+                'priceDetail',
+                'orderDetail.productVariant.product'
+            ])->find($order->id);
+
+            return new OrderDetailResource($orderNew);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -182,6 +175,31 @@ class CheckoutController extends Controller
             ], 500);
         }
     }
+
+    public function index()
+    {
+        // Mengambil semua order yang dimiliki oleh pengguna yang sedang login
+        $orders = Order::with([
+            'statusOrder',
+            'seller',
+            'priceDetail',
+            'orderDetail.productVariant.product'
+        ])->where('user_id', auth('api')->id())
+            ->get();
+
+        // Cek jika tidak ada order yang ditemukan
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'status' => 404,
+                'message' => 'Order not found.',
+                'data' => null
+            ], 404);
+        }
+
+        // Mengembalikan koleksi order dalam format yang sesuai dengan OrderDetailResource
+        return OrderResource::collection($orders);
+    }
+
 
     public function show($id)
     {

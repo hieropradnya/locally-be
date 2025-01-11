@@ -1,18 +1,19 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\OngkirController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\VoucherController;
-use App\Http\Controllers\api\SellerController;
 use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\OngkirController;
+use App\Http\Controllers\api\SellerController;
 use App\Http\Controllers\ProductVariantController;
-use App\Models\User;
 
 // user
 Route::post('/register', App\Http\Controllers\Api\RegisterController::class)->name('register');
@@ -47,18 +48,23 @@ Route::middleware('auth:api')->group(function () {
 
 
     Route::get('/voucher', [VoucherController::class, 'index']);
+    Route::get('/voucher/{id}', [VoucherController::class, 'show']);
     Route::post('/voucher', [VoucherController::class, 'store']);
-    Route::post('/voucher/{id}', [VoucherController::class, 'show']);
 
 
-    Route::get('/ongkir/getprovince', [OngkirController::class, 'getprovince']);
-    Route::get('/ongkir/getcity', [OngkirController::class, 'getcity']);
+
+
+    Route::get('/ongkir/province', [OngkirController::class, 'getprovince']);
+    Route::get('/ongkir/city/{id}', [OngkirController::class, 'getcity']);
     Route::get('/ongkir/checkshipping/{seller_id}', [OngkirController::class, 'checkshipping']);
-    Route::post('/ongkir/processshipping', [OngkirController::class, 'processshipping']);
 
 
-    Route::post('/checkout', [CheckoutController::class, 'checkout']);
-    Route::get('/checkout/{id}', [CheckoutController::class, 'show']);
+    Route::post('/order/checkout', [CheckoutController::class, 'checkout']);
+    Route::get('/order/{id}', [CheckoutController::class, 'show']);
+    Route::get('/order', [CheckoutController::class, 'index']);
+
+
+    Route::apiResource('post', PostController::class);
 });
 
 Route::get('/seller', [SellerController::class, 'index']);
@@ -66,8 +72,8 @@ Route::get('/seller/{id}', [SellerController::class, 'show']);
 
 Route::get('/product', [ProductController::class, 'index']);
 Route::get('/product/{id}', [ProductController::class, 'show']);
+// Route::get('/products/{productId}/variants', [ProductVariantController::class, 'index']);
 
-Route::get('/products/{productId}/variants', [ProductVariantController::class, 'index']);
 
 
 

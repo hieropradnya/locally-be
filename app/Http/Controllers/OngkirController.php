@@ -18,42 +18,11 @@ class OngkirController extends Controller
         return response()->json(['data' => $daftarProvinsi]);
     }
 
-    public function getcity()
+    public function getcity($id)
     {
-        $daftarKota = City::select('province_id', 'id', 'name')->get();
+        $daftarKota = City::select('province_id', 'id', 'name')->where('province_id', $id)->get();
         return response()->json(['data' => $daftarKota]);
     }
-
-    // public function checkshipping(Request $request, $seller_id)
-    // {
-
-    //     $userCity = Address::where('user_id', $request->user()->id)->firstOrFail()->city_id;
-    //     $sellerCity = Address::where('user_id', $seller_id)->firstOrFail()->city_id;
-
-    //     return response()->json([
-    //         'user' => $userCity,
-    //         'seller' => $sellerCity,
-    //     ]);
-    //     // Kirim request ke Raja Ongkir API
-    //     $response = Http::withHeaders([
-    //         'key' => env('RAJAONGKIR_API_KEY')
-    //     ])->post('https://api.rajaongkir.com/starter/cost', [
-    //         'origin' => $userCity,
-    //         'destination' => $sellerCity,
-    //         'weight' => 1000,
-    //         'courier' => 'jne',
-    //     ]);
-
-    //     if ($response->successful()) {
-    //         return response()->json(['data' => $response->json()['rajaongkir']['results'][0]['costs'][1]['cost']]);
-    //     }
-
-    //     return response()->json([
-    //         'error' => 'Failed to fetch shipping cost.',
-    //         'status' => $response->status(),
-    //         'message' => $response->body(),
-    //     ], $response->status());
-    // }
 
     public function checkshipping(Request $request, $seller_id)
     {
@@ -85,31 +54,6 @@ class OngkirController extends Controller
 
         if ($response->successful()) {
             return response()->json(['data' => $response->json()['rajaongkir']['results'][0]['costs'][1]['cost']]);
-        }
-
-        return response()->json([
-            'error' => 'Failed to fetch shipping cost.',
-            'status' => $response->status(),
-            'message' => $response->body(),
-        ], $response->status());
-    }
-
-
-
-    public function processshipping(Request $request)
-    {
-        // Kirim request ke Raja Ongkir API
-        $response = Http::withHeaders([
-            'key' => env('RAJAONGKIR_API_KEY')
-        ])->post('https://api.rajaongkir.com/starter/cost', [
-            'origin' => 501,
-            'destination' => 114,
-            'weight' => 1700,
-            'courier' => 'jne',
-        ]);
-
-        if ($response->successful()) {
-            return response()->json(['data' => $response->json()['rajaongkir']['results'][0]['costs'][1]['cost'][0]['value']]);
         }
 
         return response()->json([

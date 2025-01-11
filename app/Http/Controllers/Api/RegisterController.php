@@ -23,8 +23,8 @@ class RegisterController extends Controller
             'email'    => 'required|email|unique:users|max:255',
             'password'  => 'required|min:8',
             'phone'    => 'required|unique:users|max:15',
-            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'gender'    => 'required|in:male,female',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ], [
             'gender.in' => 'The gender must be either male or female.',
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AddressResource;
 use App\Models\Address;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -10,15 +11,16 @@ class AddressController extends Controller
 {
     public function index()
     {
-        $addresses = Address::where('user_id', auth('api')->id())->get();
-        return response()->json(['data' => $addresses], 200);
+        // Mengambil semua alamat milik pengguna yang sedang login
+        $addresses = Address::where('user_id', auth('api')->id())->with('city', 'province')->get();
+
+        // Mengembalikan koleksi AddressResource
+        return AddressResource::collection($addresses);
     }
 
-    /**
-     * Store a newly created address in storage.
-     */
     public function store(Request $request)
     {
+        // Validasi input
         $validated = $request->validate([
             'recipient_name' => 'required|string|max:50',
             'phone' => 'required|string|max:15',
@@ -28,22 +30,25 @@ class AddressController extends Controller
             'province_id' => 'required|integer',
         ]);
 
+        // Mendapatkan pengguna yang sedang login
         $user = auth('api')->user();
         $validated['user_id'] = $user->id;
 
-        // kirim pesan gagal jika sudah punya alamat
+        // Periksa apakah pengguna sudah memiliki alamat
         $existingAddress = Address::where('user_id', $user->id)->first();
         if ($existingAddress) {
             return response()->json([
-                'message' => 'You have created an adress record.'
+                'message' => 'You have already created an address record.'
             ], 400);
         }
 
-
+        // Buat alamat baru
         $address = Address::create($validated);
+        // Memuat relasi city dan province
         $address->load('city', 'province');
 
-        return response()->json(['data' => $address], 201);
+        // Mengembalikan AddressResource untuk alamat yang baru dibuat
+        return new AddressResource($address);
     }
 
 

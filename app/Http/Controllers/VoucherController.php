@@ -36,7 +36,7 @@ class VoucherController extends Controller
      */
     public function show($id)
     {
-        $voucher = Voucher::find($id);
+        $voucher = Voucher::findOrFail($id);
 
         if (!$voucher) {
             return response()->json(['message' => 'Voucher not found'], 404);
